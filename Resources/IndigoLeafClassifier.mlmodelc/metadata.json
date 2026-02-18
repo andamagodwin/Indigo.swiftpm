@@ -1,0 +1,81 @@
+[
+  {
+    "metadataOutputVersion" : "3.0",
+    "shortDescription" : "Offline image classifier for detecting healthy coffee leaves versus coffee leaf rust, designed for small-scale farmers.",
+    "outputSchema" : [
+      {
+        "isOptional" : "0",
+        "formattedType" : "String",
+        "type" : "String",
+        "name" : "target",
+        "shortDescription" : ""
+      },
+      {
+        "isOptional" : "0",
+        "keyType" : "String",
+        "formattedType" : "Dictionary (String → Double)",
+        "type" : "Dictionary",
+        "name" : "targetProbability",
+        "shortDescription" : ""
+      }
+    ],
+    "modelParameters" : [
+
+    ],
+    "author" : "Andama Ezra",
+    "specificationVersion" : 3,
+    "license" : "MIT License",
+    "stateSchema" : [
+
+    ],
+    "isUpdatable" : "0",
+    "availability" : {
+      "macOS" : "10.14",
+      "tvOS" : "12.0",
+      "visionOS" : "1.0",
+      "watchOS" : "unavailable",
+      "iOS" : "12.0",
+      "macCatalyst" : "12.0"
+    },
+    "modelType" : {
+      "name" : "MLModelType_imageClassifier",
+      "structure" : [
+        {
+          "name" : "MLModelType_visionFeaturePrint"
+        },
+        {
+          "name" : "MLModelType_glmClassifier"
+        }
+      ]
+    },
+    "inputSchema" : [
+      {
+        "height" : "299",
+        "colorspace" : "BGR",
+        "isOptional" : "0",
+        "width" : "299",
+        "isColor" : "1",
+        "formattedType" : "Image (Color 299 × 299)",
+        "hasSizeFlexibility" : "0",
+        "type" : "Image",
+        "shortDescription" : "",
+        "name" : "image"
+      }
+    ],
+    "classLabels" : [
+      "Healthy",
+      "Rust"
+    ],
+    "generatedClassName" : "IndigoLeafClassifier",
+    "userDefinedMetadata" : {
+      "com.apple.coreml.model.preview.type" : "imageClassifier",
+      "com.apple.createml.training.started" : "2026-02-09T18:33:32Z",
+      "com.apple.createml.version" : "26.2.0",
+      "com.apple.createml.training.finished" : "2026-02-09T18:33:33Z",
+      "com.apple.createml.app.tag" : "175.7",
+      "com.apple.createml.model.created" : "2026-02-09T18:33:33Z",
+      "com.apple.createml.app.version" : "6.2"
+    },
+    "method" : "predict"
+  }
+]
