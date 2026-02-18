@@ -14,6 +14,19 @@ struct ScannerSnapView: View {
     @State private var errorText: String = ""
     @State private var synthesizer = AVSpeechSynthesizer()
 
+    // Coffee palette
+    private let espresso    = Color(red: 0.16, green: 0.07, blue: 0.04)
+    private let darkRoast   = Color(red: 0.24, green: 0.12, blue: 0.06)
+    private let lightRoast  = Color(red: 0.54, green: 0.35, blue: 0.18)
+    private let caramel     = Color(red: 0.76, green: 0.56, blue: 0.34)
+    private let cream       = Color(red: 0.96, green: 0.91, blue: 0.84)
+    private let leafGreen   = Color(red: 0.30, green: 0.60, blue: 0.30)
+    private let mintGreen   = Color(red: 0.40, green: 0.75, blue: 0.50)
+    private let rustOrange  = Color(red: 0.85, green: 0.45, blue: 0.15)
+    private let dangerRed   = Color(red: 0.80, green: 0.25, blue: 0.20)
+    private let textSec     = Color(red: 0.76, green: 0.66, blue: 0.54)
+    private let textMuted   = Color(red: 0.56, green: 0.46, blue: 0.36)
+
     private let sampleImages = [
         "healthy_1", "healthy_2", "healthy_3",
         "rust_1", "rust_2", "rust_3"
@@ -21,31 +34,45 @@ struct ScannerSnapView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            LinearGradient(colors: [espresso, darkRoast],
+                           startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
 
             VStack(spacing: 16) {
-                // Camera frame — constrained height
                 cameraFrame
-                    .frame(maxHeight: 320)
+                    .frame(maxHeight: 300)
                     .padding(.horizontal, 24)
+                    .padding(.top, 8)
 
-                // Snap button — always visible
                 snapButton
 
-                // Status / Results
                 ScrollView {
                     VStack(spacing: 16) {
                         if isProcessing {
-                            ProgressView("Analyzing…")
-                                .foregroundColor(.white)
-                                .tint(.green)
+                            HStack(spacing: 10) {
+                                ProgressView().tint(caramel)
+                                Text("Analyzing leaf…")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(textSec)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(darkRoast.opacity(0.6))
+                            )
                         }
 
                         if !errorText.isEmpty {
                             Text(errorText)
                                 .font(.caption)
-                                .foregroundColor(.red)
-                                .multilineTextAlignment(.center)
+                                .foregroundColor(dangerRed)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(dangerRed.opacity(0.1))
+                                )
                         }
 
                         if hasResult {
@@ -54,15 +81,12 @@ struct ScannerSnapView: View {
                         }
                     }
                     .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
                 }
             }
-            .padding(.top, 8)
 
-            // Flash overlay
             if showFlash {
-                Color.white
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
+                cream.ignoresSafeArea().allowsHitTesting(false)
             }
         }
         .navigationTitle("Leaf Scanner")
@@ -75,11 +99,13 @@ struct ScannerSnapView: View {
     private var cameraFrame: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.1))
+                .fill(Color(white: 0.06))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.green.opacity(0.5), lineWidth: 2)
+                        .stroke(caramel.opacity(0.4), lineWidth: 2)
                 )
+
+            cameraCorners
 
             if let image = selectedImage {
                 Image(uiImage: image)
@@ -89,13 +115,46 @@ struct ScannerSnapView: View {
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "viewfinder")
-                        .font(.system(size: 48))
-                        .foregroundColor(.green.opacity(0.6))
+                        .font(.system(size: 44))
+                        .foregroundColor(caramel.opacity(0.5))
                     Text("Tap Snap to capture a leaf")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.5))
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(textMuted)
                 }
             }
+        }
+    }
+
+    private var cameraCorners: some View {
+        GeometryReader { geo in
+            let s: CGFloat = 24
+            let pad: CGFloat = 8
+            let color = caramel.opacity(0.6)
+            let w: CGFloat = 3
+
+            Path { p in
+                p.move(to: CGPoint(x: pad, y: pad + s))
+                p.addLine(to: CGPoint(x: pad, y: pad))
+                p.addLine(to: CGPoint(x: pad + s, y: pad))
+            }.stroke(color, lineWidth: w)
+
+            Path { p in
+                p.move(to: CGPoint(x: geo.size.width - pad - s, y: pad))
+                p.addLine(to: CGPoint(x: geo.size.width - pad, y: pad))
+                p.addLine(to: CGPoint(x: geo.size.width - pad, y: pad + s))
+            }.stroke(color, lineWidth: w)
+
+            Path { p in
+                p.move(to: CGPoint(x: pad, y: geo.size.height - pad - s))
+                p.addLine(to: CGPoint(x: pad, y: geo.size.height - pad))
+                p.addLine(to: CGPoint(x: pad + s, y: geo.size.height - pad))
+            }.stroke(color, lineWidth: w)
+
+            Path { p in
+                p.move(to: CGPoint(x: geo.size.width - pad - s, y: geo.size.height - pad))
+                p.addLine(to: CGPoint(x: geo.size.width - pad, y: geo.size.height - pad))
+                p.addLine(to: CGPoint(x: geo.size.width - pad, y: geo.size.height - pad - s))
+            }.stroke(color, lineWidth: w)
         }
     }
 
@@ -107,16 +166,13 @@ struct ScannerSnapView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(colors: [.green, .mint],
-                                       startPoint: .topLeading,
-                                       endPoint: .bottomTrailing)
-                    )
+                    .fill(LinearGradient(colors: [caramel, lightRoast],
+                                         startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 72, height: 72)
-                    .shadow(color: .green.opacity(0.5), radius: 8)
+                    .shadow(color: caramel.opacity(0.5), radius: 10)
 
                 Circle()
-                    .stroke(Color.white.opacity(0.3), lineWidth: 3)
+                    .stroke(cream.opacity(0.3), lineWidth: 3)
                     .frame(width: 80, height: 80)
 
                 Image(systemName: "camera.fill")
@@ -125,57 +181,56 @@ struct ScannerSnapView: View {
             }
         }
         .disabled(isProcessing)
+        .opacity(isProcessing ? 0.5 : 1.0)
     }
 
     // MARK: - Result Card
 
     private var resultCard: some View {
-        VStack(spacing: 12) {
-            HStack {
+        VStack(spacing: 14) {
+            HStack(spacing: 8) {
                 Image(systemName: isRust ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(isRust ? .orange : .green)
+                    .font(.title3)
+                    .foregroundColor(isRust ? rustOrange : leafGreen)
 
                 Text(isRust ? "Disease Detected" : "Healthy Leaf")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(cream)
+                Spacer()
             }
 
-            VStack(spacing: 6) {
-                HStack {
-                    Text("Result:")
-                        .foregroundColor(.white.opacity(0.6))
-                    Text(resultLabel)
-                        .foregroundColor(.white)
-                        .bold()
-                }
+            Divider().overlay(caramel.opacity(0.2))
 
-                HStack {
-                    Text("Confidence:")
-                        .foregroundColor(.white.opacity(0.6))
-                    Text("\(Int(confidence))%")
-                        .foregroundColor(.white)
-                        .bold()
+            HStack {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Text("Result:").font(.subheadline).foregroundColor(textMuted)
+                        Text(resultLabel).font(.subheadline.weight(.semibold)).foregroundColor(cream)
+                    }
+                    HStack(spacing: 6) {
+                        Text("Confidence:").font(.subheadline).foregroundColor(textMuted)
+                        Text("\(Int(confidence))%").font(.subheadline.weight(.semibold)).foregroundColor(cream)
+                    }
                 }
+                Spacer()
             }
-            .font(.subheadline)
 
             Text(isRust
                  ? "⚠️ This leaf shows signs of Coffee Leaf Rust. Quarantine the plant and apply a copper-based fungicide immediately."
                  : "✅ This leaf looks healthy! Keep monitoring regularly to catch any issues early.")
                 .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
-                .multilineTextAlignment(.center)
+                .foregroundColor(textSec)
+                .multilineTextAlignment(.leading)
                 .padding(.top, 4)
+                .lineSpacing(3)
         }
-        .padding()
+        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(white: 0.12))
+                .fill(darkRoast)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(isRust ? Color.orange.opacity(0.4) : Color.green.opacity(0.4),
-                                lineWidth: 1)
+                        .stroke(isRust ? rustOrange.opacity(0.3) : leafGreen.opacity(0.3), lineWidth: 1)
                 )
         )
     }
@@ -190,13 +245,13 @@ struct ScannerSnapView: View {
                 Label("Listen", systemImage: "speaker.wave.2.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .foregroundColor(.white)
+                    .padding(.vertical, 16)
+                    .background(darkRoast.opacity(0.6))
+                    .foregroundColor(cream)
                     .cornerRadius(16)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            .stroke(caramel.opacity(0.4), lineWidth: 1)
                     )
             }
 
@@ -204,15 +259,12 @@ struct ScannerSnapView: View {
                 Label("Continue", systemImage: "arrow.right.circle.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        LinearGradient(colors: [.green, .mint],
-                                       startPoint: .leading,
-                                       endPoint: .trailing)
-                    )
+                    .padding(.vertical, 16)
+                    .background(LinearGradient(colors: [leafGreen, mintGreen],
+                                              startPoint: .leading, endPoint: .trailing))
                     .foregroundColor(.white)
                     .cornerRadius(16)
-                    .shadow(color: .green.opacity(0.4), radius: 8, y: 4)
+                    .shadow(color: leafGreen.opacity(0.4), radius: 8, y: 4)
             }
         }
     }
@@ -223,7 +275,6 @@ struct ScannerSnapView: View {
         errorText = ""
         let name = sampleImages.randomElement() ?? "healthy_1"
 
-        // Try loading from Bundle.main
         guard let url = Bundle.main.url(forResource: name, withExtension: "jpg") else {
             errorText = "Could not find \(name).jpg in bundle"
             hasResult = false
@@ -232,12 +283,11 @@ struct ScannerSnapView: View {
 
         guard let data = try? Data(contentsOf: url),
               let uiImage = UIImage(data: data) else {
-            errorText = "Could not load image data for \(name).jpg"
+            errorText = "Could not load image data"
             hasResult = false
             return
         }
 
-        // Flash effect
         withAnimation(.easeIn(duration: 0.1)) { showFlash = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             withAnimation(.easeOut(duration: 0.25)) { showFlash = false }
@@ -246,8 +296,6 @@ struct ScannerSnapView: View {
         selectedImage = uiImage
         isProcessing = true
         hasResult = false
-
-        // Run classification
         classifyImage(uiImage)
     }
 
@@ -256,7 +304,7 @@ struct ScannerSnapView: View {
     private func classifyImage(_ uiImage: UIImage) {
         guard let modelURL = Bundle.main.url(forResource: "IndigoLeafClassifier",
                                               withExtension: "mlmodelc") else {
-            errorText = "Could not find IndigoLeafClassifier.mlmodelc in bundle"
+            errorText = "Could not find model in bundle"
             isProcessing = false
             return
         }
