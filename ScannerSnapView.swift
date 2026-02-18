@@ -11,6 +11,7 @@ struct ScannerSnapView: View {
     @State private var selectedImage: UIImage? = nil
     @State private var showFlash: Bool = false
     @State private var isProcessing: Bool = false
+    @State private var errorText: String = ""
     @State private var synthesizer = AVSpeechSynthesizer()
 
     private let sampleImages = [
@@ -20,26 +21,42 @@ struct ScannerSnapView: View {
 
     var body: some View {
         ZStack {
-            // Background
             Color.black.ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 20) {
-                    cameraFrame
-                    snapButton
-                    if isProcessing {
-                        ProgressView("Analyzing…")
-                            .foregroundColor(.white)
-                            .tint(.green)
+            VStack(spacing: 16) {
+                // Camera frame — constrained height
+                cameraFrame
+                    .frame(maxHeight: 320)
+                    .padding(.horizontal, 24)
+
+                // Snap button — always visible
+                snapButton
+
+                // Status / Results
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if isProcessing {
+                            ProgressView("Analyzing…")
+                                .foregroundColor(.white)
+                                .tint(.green)
+                        }
+
+                        if !errorText.isEmpty {
+                            Text(errorText)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                        }
+
+                        if hasResult {
+                            resultCard
+                            actionButtons
+                        }
                     }
-                    if hasResult {
-                        resultCard
-                        actionButtons
-                    }
+                    .padding(.horizontal, 24)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
             }
+            .padding(.top, 8)
 
             // Flash overlay
             if showFlash {
@@ -59,7 +76,6 @@ struct ScannerSnapView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(white: 0.1))
-                .aspectRatio(3.0 / 4.0, contentMode: .fit)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Color.green.opacity(0.5), lineWidth: 2)
@@ -69,8 +85,6 @@ struct ScannerSnapView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(3.0 / 4.0, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
             } else {
                 VStack(spacing: 12) {
@@ -206,13 +220,20 @@ struct ScannerSnapView: View {
     // MARK: - Snap Logic
 
     private func performSnap() {
-        // Pick a random sample image
+        errorText = ""
         let name = sampleImages.randomElement() ?? "healthy_1"
-        guard let url = Bundle.main.url(forResource: name, withExtension: "jpg"),
-              let data = try? Data(contentsOf: url),
+
+        // Try loading from Bundle.main
+        guard let url = Bundle.main.url(forResource: name, withExtension: "jpg") else {
+            errorText = "Could not find \(name).jpg in bundle"
+            hasResult = false
+            return
+        }
+
+        guard let data = try? Data(contentsOf: url),
               let uiImage = UIImage(data: data) else {
-            resultLabel = "Error: Could not load image"
-            hasResult = true
+            errorText = "Could not load image data for \(name).jpg"
+            hasResult = false
             return
         }
 
@@ -235,7 +256,8 @@ struct ScannerSnapView: View {
     private func classifyImage(_ uiImage: UIImage) {
         guard let modelURL = Bundle.main.url(forResource: "IndigoLeafClassifier",
                                               withExtension: "mlmodelc") else {
-            finalizeResult("Error", 0)
+            errorText = "Could not find IndigoLeafClassifier.mlmodelc in bundle"
+            isProcessing = false
             return
         }
 
@@ -244,13 +266,25 @@ struct ScannerSnapView: View {
             let vnModel = try VNCoreMLModel(for: mlModel)
 
             guard let ciImage = CIImage(image: uiImage) else {
-                finalizeResult("Error", 0)
+                errorText = "Could not create CIImage"
+                isProcessing = false
                 return
             }
 
-            let request = VNCoreMLRequest(model: vnModel) { request, _ in
+            let request = VNCoreMLRequest(model: vnModel) { request, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        self.errorText = "Vision error: \(error.localizedDescription)"
+                        self.isProcessing = false
+                    }
+                    return
+                }
                 guard let results = request.results as? [VNClassificationObservation],
                       let top = results.first else {
+                    DispatchQueue.main.async {
+                        self.errorText = "No classification results"
+                        self.isProcessing = false
+                    }
                     return
                 }
                 let label = top.identifier
@@ -264,7 +298,8 @@ struct ScannerSnapView: View {
             let handler = VNImageRequestHandler(ciImage: ciImage)
             try handler.perform([request])
         } catch {
-            finalizeResult("Error", 0)
+            errorText = "ML error: \(error.localizedDescription)"
+            isProcessing = false
         }
     }
 
@@ -274,6 +309,7 @@ struct ScannerSnapView: View {
         isRust = label.lowercased().contains("rust")
         isProcessing = false
         hasResult = true
+        errorText = ""
     }
 
     // MARK: - Speech
