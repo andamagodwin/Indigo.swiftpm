@@ -40,6 +40,7 @@ let package = Package(
             path: ".",
             exclude: ["Resources/IndigoLeafClassifier.mlmodel"],
             resources: [
+                .process("Assets.xcassets"),
                 .copy("Resources/IndigoLeafClassifier.mlmodelc"),
                 .process("Resources/healthy_1.jpg"),
                 .process("Resources/healthy_2.jpg"),
@@ -50,5 +51,5 @@ let package = Package(
             ]
         )
     ],
-    swiftLanguageVersions: [.v6]
+    swiftLanguageVersions: [.v5]
 )

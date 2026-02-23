@@ -12,20 +12,19 @@ struct ScannerSnapView: View {
     @State private var showFlash: Bool = false
     @State private var isProcessing: Bool = false
     @State private var errorText: String = ""
-    @State private var synthesizer = AVSpeechSynthesizer()
 
-    // Coffee palette
-    private let espresso    = Color(red: 0.16, green: 0.07, blue: 0.04)
-    private let darkRoast   = Color(red: 0.24, green: 0.12, blue: 0.06)
-    private let lightRoast  = Color(red: 0.54, green: 0.35, blue: 0.18)
+
+    // Coffee palette on white
+    private let coffee      = Color(red: 0.38, green: 0.22, blue: 0.10)
+    private let coffeeLight = Color(red: 0.54, green: 0.35, blue: 0.18)
     private let caramel     = Color(red: 0.76, green: 0.56, blue: 0.34)
-    private let cream       = Color(red: 0.96, green: 0.91, blue: 0.84)
-    private let leafGreen   = Color(red: 0.30, green: 0.60, blue: 0.30)
-    private let mintGreen   = Color(red: 0.40, green: 0.75, blue: 0.50)
+    private let coffeeBg    = Color(red: 0.97, green: 0.95, blue: 0.92)
+    private let leafGreen   = Color(red: 0.25, green: 0.55, blue: 0.25)
+    private let mintGreen   = Color(red: 0.35, green: 0.70, blue: 0.45)
     private let rustOrange  = Color(red: 0.85, green: 0.45, blue: 0.15)
-    private let dangerRed   = Color(red: 0.80, green: 0.25, blue: 0.20)
-    private let textSec     = Color(red: 0.76, green: 0.66, blue: 0.54)
-    private let textMuted   = Color(red: 0.56, green: 0.46, blue: 0.36)
+    private let dangerRed   = Color(red: 0.75, green: 0.22, blue: 0.18)
+    private let textDark    = Color(red: 0.20, green: 0.12, blue: 0.08)
+    private let textSec     = Color(red: 0.50, green: 0.40, blue: 0.32)
 
     private let sampleImages = [
         "healthy_1", "healthy_2", "healthy_3",
@@ -34,9 +33,7 @@ struct ScannerSnapView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [espresso, darkRoast],
-                           startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 16) {
                 cameraFrame
@@ -50,7 +47,7 @@ struct ScannerSnapView: View {
                     VStack(spacing: 16) {
                         if isProcessing {
                             HStack(spacing: 10) {
-                                ProgressView().tint(caramel)
+                                ProgressView().tint(coffee)
                                 Text("Analyzing leaf…")
                                     .font(.subheadline.weight(.medium))
                                     .foregroundColor(textSec)
@@ -58,8 +55,7 @@ struct ScannerSnapView: View {
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(darkRoast.opacity(0.6))
+                                RoundedRectangle(cornerRadius: 12).fill(coffeeBg)
                             )
                         }
 
@@ -71,7 +67,7 @@ struct ScannerSnapView: View {
                                 .frame(maxWidth: .infinity)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(dangerRed.opacity(0.1))
+                                        .fill(dangerRed.opacity(0.08))
                                 )
                         }
 
@@ -86,12 +82,11 @@ struct ScannerSnapView: View {
             }
 
             if showFlash {
-                cream.ignoresSafeArea().allowsHitTesting(false)
+                Color.white.ignoresSafeArea().allowsHitTesting(false)
             }
         }
         .navigationTitle("Leaf Scanner")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 
     // MARK: - Camera Frame
@@ -99,10 +94,10 @@ struct ScannerSnapView: View {
     private var cameraFrame: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.06))
+                .fill(coffeeBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(caramel.opacity(0.4), lineWidth: 2)
+                        .stroke(coffee.opacity(0.25), lineWidth: 2)
                 )
 
             cameraCorners
@@ -116,10 +111,10 @@ struct ScannerSnapView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "viewfinder")
                         .font(.system(size: 44))
-                        .foregroundColor(caramel.opacity(0.5))
+                        .foregroundColor(coffee.opacity(0.35))
                     Text("Tap Snap to capture a leaf")
                         .font(.caption.weight(.medium))
-                        .foregroundColor(textMuted)
+                        .foregroundColor(textSec)
                 }
             }
         }
@@ -129,7 +124,7 @@ struct ScannerSnapView: View {
         GeometryReader { geo in
             let s: CGFloat = 24
             let pad: CGFloat = 8
-            let color = caramel.opacity(0.6)
+            let color = coffee.opacity(0.4)
             let w: CGFloat = 3
 
             Path { p in
@@ -166,13 +161,15 @@ struct ScannerSnapView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(LinearGradient(colors: [caramel, lightRoast],
-                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(
+                        LinearGradient(colors: [coffee, coffeeLight],
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
                     .frame(width: 72, height: 72)
-                    .shadow(color: caramel.opacity(0.5), radius: 10)
+                    .shadow(color: coffee.opacity(0.3), radius: 10)
 
                 Circle()
-                    .stroke(cream.opacity(0.3), lineWidth: 3)
+                    .stroke(coffee.opacity(0.2), lineWidth: 3)
                     .frame(width: 80, height: 80)
 
                 Image(systemName: "camera.fill")
@@ -195,21 +192,21 @@ struct ScannerSnapView: View {
 
                 Text(isRust ? "Disease Detected" : "Healthy Leaf")
                     .font(.headline)
-                    .foregroundColor(cream)
+                    .foregroundColor(textDark)
                 Spacer()
             }
 
-            Divider().overlay(caramel.opacity(0.2))
+            Divider()
 
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
-                        Text("Result:").font(.subheadline).foregroundColor(textMuted)
-                        Text(resultLabel).font(.subheadline.weight(.semibold)).foregroundColor(cream)
+                        Text("Result:").font(.subheadline).foregroundColor(textSec)
+                        Text(resultLabel).font(.subheadline.weight(.semibold)).foregroundColor(textDark)
                     }
                     HStack(spacing: 6) {
-                        Text("Confidence:").font(.subheadline).foregroundColor(textMuted)
-                        Text("\(Int(confidence))%").font(.subheadline.weight(.semibold)).foregroundColor(cream)
+                        Text("Confidence:").font(.subheadline).foregroundColor(textSec)
+                        Text("\(Int(confidence))%").font(.subheadline.weight(.semibold)).foregroundColor(textDark)
                     }
                 }
                 Spacer()
@@ -227,10 +224,10 @@ struct ScannerSnapView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(darkRoast)
+                .fill(coffeeBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(isRust ? rustOrange.opacity(0.3) : leafGreen.opacity(0.3), lineWidth: 1)
+                        .stroke(isRust ? rustOrange.opacity(0.2) : leafGreen.opacity(0.2), lineWidth: 1)
                 )
         )
     }
@@ -246,25 +243,29 @@ struct ScannerSnapView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(darkRoast.opacity(0.6))
-                    .foregroundColor(cream)
+                    .background(coffeeBg)
+                    .foregroundColor(coffee)
                     .cornerRadius(16)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(caramel.opacity(0.4), lineWidth: 1)
+                            .stroke(coffee.opacity(0.2), lineWidth: 1)
                     )
             }
 
-            NavigationLink(destination: RecoveryView()) {
+            NavigationLink {
+                RecoveryView()
+            } label: {
                 Label("Continue", systemImage: "arrow.right.circle.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(LinearGradient(colors: [leafGreen, mintGreen],
-                                              startPoint: .leading, endPoint: .trailing))
+                    .background(
+                        LinearGradient(colors: [leafGreen, mintGreen],
+                                       startPoint: .leading, endPoint: .trailing)
+                    )
                     .foregroundColor(.white)
                     .cornerRadius(16)
-                    .shadow(color: leafGreen.opacity(0.4), radius: 8, y: 4)
+                    .shadow(color: leafGreen.opacity(0.3), radius: 8, y: 4)
             }
         }
     }
@@ -367,6 +368,7 @@ struct ScannerSnapView: View {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.rate = 0.5
-        synthesizer.speak(utterance)
+        let speaker = AVSpeechSynthesizer()
+        speaker.speak(utterance)
     }
 }
