@@ -83,7 +83,7 @@ struct PlantingView: View {
             Image("plant\(currentImageIndex)")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 250, height: 250)
+                .frame(width: 400, height: 400)
                 .id(currentImageIndex)  // Forces SwiftUI to treat each frame as a unique view for transition
                 .transition(.opacity.animation(.easeInOut(duration: 0.5)))
                 .shadow(color: mintGreen.opacity(0.4), radius: currentImageIndex == 4 ? 12 : 0)
@@ -92,7 +92,7 @@ struct PlantingView: View {
             if !isPlanted {
                 Circle()
                     .fill(Color.white.opacity(0.01))
-                    .frame(width: 200, height: 200)
+                    .frame(width: 300, height: 300)
                     .onTapGesture {
                         triggerGrowthSequence()
                     }
@@ -108,7 +108,7 @@ struct PlantingView: View {
                     )
             }
         }
-        .frame(height: 250)
+        .frame(height: 400)
         .onAppear {
             // Start the pulsing tap hint
             phase = -1

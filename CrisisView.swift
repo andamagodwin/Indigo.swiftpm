@@ -57,7 +57,7 @@ struct CrisisView: View {
             Image("crisis\(currentImageIndex)")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 250, height: 250)
+                .frame(width: 400, height: 400)
                 .id(currentImageIndex)  // Forces SwiftUI to treat each frame as a unique view for transition
                 .transition(.opacity.animation(.easeInOut(duration: 0.4)))
                 .shadow(color: rustOrange.opacity(0.4), radius: currentImageIndex == 6 ? 12 : 0)
@@ -66,7 +66,7 @@ struct CrisisView: View {
             if !isInfected {
                 Circle()
                     .fill(Color.white.opacity(0.01))
-                    .frame(width: 200, height: 200)
+                    .frame(width: 300, height: 300)
                     .onTapGesture {
                         triggerInfectionSequence()
                     }
@@ -82,7 +82,7 @@ struct CrisisView: View {
                     )
             }
         }
-        .frame(height: 250)
+        .frame(height: 400)
         .onAppear {
             // Start the pulsing tap hint
             phase = -1
