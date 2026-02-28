@@ -1,7 +1,7 @@
-import SwiftUI
-import CoreML
-import Vision
 import AVFoundation
+import CoreML
+import SwiftUI
+import Vision
 
 struct ScannerSnapView: View {
     @State private var resultLabel: String = ""
@@ -13,22 +13,21 @@ struct ScannerSnapView: View {
     @State private var isProcessing: Bool = false
     @State private var errorText: String = ""
 
-
     // Coffee palette on white
-    private let coffee      = Color(red: 0.38, green: 0.22, blue: 0.10)
+    private let coffee = Color(red: 0.38, green: 0.22, blue: 0.10)
     private let coffeeLight = Color(red: 0.54, green: 0.35, blue: 0.18)
-    private let caramel     = Color(red: 0.76, green: 0.56, blue: 0.34)
-    private let coffeeBg    = Color(red: 0.97, green: 0.95, blue: 0.92)
-    private let leafGreen   = Color(red: 0.25, green: 0.55, blue: 0.25)
-    private let mintGreen   = Color(red: 0.35, green: 0.70, blue: 0.45)
-    private let rustOrange  = Color(red: 0.85, green: 0.45, blue: 0.15)
-    private let dangerRed   = Color(red: 0.75, green: 0.22, blue: 0.18)
-    private let textDark    = Color(red: 0.20, green: 0.12, blue: 0.08)
-    private let textSec     = Color(red: 0.50, green: 0.40, blue: 0.32)
+    private let caramel = Color(red: 0.76, green: 0.56, blue: 0.34)
+    private let coffeeBg = Color(red: 0.97, green: 0.95, blue: 0.92)
+    private let leafGreen = Color(red: 0.25, green: 0.55, blue: 0.25)
+    private let mintGreen = Color(red: 0.35, green: 0.70, blue: 0.45)
+    private let rustOrange = Color(red: 0.85, green: 0.45, blue: 0.15)
+    private let dangerRed = Color(red: 0.75, green: 0.22, blue: 0.18)
+    private let textDark = Color(red: 0.20, green: 0.12, blue: 0.08)
+    private let textSec = Color(red: 0.50, green: 0.40, blue: 0.32)
 
     private let sampleImages = [
         "healthy_1", "healthy_2", "healthy_3",
-        "rust_1", "rust_2", "rust_3"
+        "rust_1", "rust_2", "rust_3",
     ]
 
     var body: some View {
@@ -162,8 +161,9 @@ struct ScannerSnapView: View {
             ZStack {
                 Circle()
                     .fill(
-                        LinearGradient(colors: [coffee, coffeeLight],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                        LinearGradient(
+                            colors: [coffee, coffeeLight],
+                            startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .frame(width: 72, height: 72)
                     .shadow(color: coffee.opacity(0.3), radius: 10)
@@ -186,9 +186,11 @@ struct ScannerSnapView: View {
     private var resultCard: some View {
         VStack(spacing: 14) {
             HStack(spacing: 8) {
-                Image(systemName: isRust ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                    .font(.title3)
-                    .foregroundColor(isRust ? rustOrange : leafGreen)
+                Image(
+                    systemName: isRust ? "exclamationmark.triangle.fill" : "checkmark.circle.fill"
+                )
+                .font(.title3)
+                .foregroundColor(isRust ? rustOrange : leafGreen)
 
                 Text(isRust ? "Disease Detected" : "Healthy Leaf")
                     .font(.headline)
@@ -202,24 +204,28 @@ struct ScannerSnapView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
                         Text("Result:").font(.subheadline).foregroundColor(textSec)
-                        Text(resultLabel).font(.subheadline.weight(.semibold)).foregroundColor(textDark)
+                        Text(resultLabel).font(.subheadline.weight(.semibold)).foregroundColor(
+                            textDark)
                     }
                     HStack(spacing: 6) {
                         Text("Confidence:").font(.subheadline).foregroundColor(textSec)
-                        Text("\(Int(confidence))%").font(.subheadline.weight(.semibold)).foregroundColor(textDark)
+                        Text("\(Int(confidence))%").font(.subheadline.weight(.semibold))
+                            .foregroundColor(textDark)
                     }
                 }
                 Spacer()
             }
 
-            Text(isRust
-                 ? "⚠️ This leaf shows signs of Coffee Leaf Rust. Quarantine the plant and apply a copper-based fungicide immediately."
-                 : "✅ This leaf looks healthy! Keep monitoring regularly to catch any issues early.")
-                .font(.caption)
-                .foregroundColor(textSec)
-                .multilineTextAlignment(.leading)
-                .padding(.top, 4)
-                .lineSpacing(3)
+            Text(
+                isRust
+                    ? "⚠️ This leaf shows signs of Coffee Leaf Rust. Quarantine the plant and apply a copper-based fungicide immediately."
+                    : "✅ This leaf looks healthy! Keep monitoring regularly to catch any issues early."
+            )
+            .font(.caption)
+            .foregroundColor(textSec)
+            .multilineTextAlignment(.leading)
+            .padding(.top, 4)
+            .lineSpacing(3)
         }
         .padding(16)
         .background(
@@ -227,7 +233,8 @@ struct ScannerSnapView: View {
                 .fill(coffeeBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(isRust ? rustOrange.opacity(0.2) : leafGreen.opacity(0.2), lineWidth: 1)
+                        .stroke(
+                            isRust ? rustOrange.opacity(0.2) : leafGreen.opacity(0.2), lineWidth: 1)
                 )
         )
     }
@@ -252,16 +259,15 @@ struct ScannerSnapView: View {
                     )
             }
 
-            NavigationLink {
-                RecoveryView()
-            } label: {
+            NavigationLink(value: "Recovery") {
                 Label("Continue", systemImage: "arrow.right.circle.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(
-                        LinearGradient(colors: [leafGreen, mintGreen],
-                                       startPoint: .leading, endPoint: .trailing)
+                        LinearGradient(
+                            colors: [leafGreen, mintGreen],
+                            startPoint: .leading, endPoint: .trailing)
                     )
                     .foregroundColor(.white)
                     .cornerRadius(16)
@@ -283,7 +289,8 @@ struct ScannerSnapView: View {
         }
 
         guard let data = try? Data(contentsOf: url),
-              let uiImage = UIImage(data: data) else {
+            let uiImage = UIImage(data: data)
+        else {
             errorText = "Could not load image data"
             hasResult = false
             return
@@ -303,8 +310,11 @@ struct ScannerSnapView: View {
     // MARK: - Core ML Classification
 
     private func classifyImage(_ uiImage: UIImage) {
-        guard let modelURL = Bundle.main.url(forResource: "IndigoLeafClassifier",
-                                              withExtension: "mlmodelc") else {
+        guard
+            let modelURL = Bundle.main.url(
+                forResource: "IndigoLeafClassifier",
+                withExtension: "mlmodelc")
+        else {
             errorText = "Could not find model in bundle"
             isProcessing = false
             return
@@ -329,7 +339,8 @@ struct ScannerSnapView: View {
                     return
                 }
                 guard let results = request.results as? [VNClassificationObservation],
-                      let top = results.first else {
+                    let top = results.first
+                else {
                     DispatchQueue.main.async {
                         self.errorText = "No classification results"
                         self.isProcessing = false

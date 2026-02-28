@@ -4,14 +4,14 @@ struct ContentView: View {
     @State private var animate = false
 
     // Coffee palette on white
-    private let coffee      = Color(red: 0.38, green: 0.22, blue: 0.10)
+    private let coffee = Color(red: 0.38, green: 0.22, blue: 0.10)
     private let coffeeLight = Color(red: 0.54, green: 0.35, blue: 0.18)
-    private let caramel     = Color(red: 0.76, green: 0.56, blue: 0.34)
-    private let coffeeBg    = Color(red: 0.97, green: 0.95, blue: 0.92)
-    private let amber       = Color(red: 0.75, green: 0.50, blue: 0.15)
-    private let leafGreen   = Color(red: 0.25, green: 0.55, blue: 0.25)
-    private let textDark    = Color(red: 0.20, green: 0.12, blue: 0.08)
-    private let textSec     = Color(red: 0.50, green: 0.40, blue: 0.32)
+    private let caramel = Color(red: 0.76, green: 0.56, blue: 0.34)
+    private let coffeeBg = Color(red: 0.97, green: 0.95, blue: 0.92)
+    private let amber = Color(red: 0.75, green: 0.50, blue: 0.15)
+    private let leafGreen = Color(red: 0.25, green: 0.55, blue: 0.25)
+    private let textDark = Color(red: 0.20, green: 0.12, blue: 0.08)
+    private let textSec = Color(red: 0.50, green: 0.40, blue: 0.32)
 
     var body: some View {
         NavigationStack {
@@ -36,6 +36,20 @@ struct ContentView: View {
                 .padding(.horizontal, 32)
             }
             .navigationBarHidden(true)
+            .navigationDestination(for: String.self) { route in
+                switch route {
+                case "Planting":
+                    PlantingView()
+                case "Scanner":
+                    ScannerSnapView()
+                case "Crisis":
+                    CrisisView()
+                case "Recovery":
+                    RecoveryView()
+                default:
+                    EmptyView()
+                }
+            }
         }
     }
 
@@ -46,7 +60,7 @@ struct ContentView: View {
             Image("logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 120, height: 120)
+                .frame(width: 132, height: 132)
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .shadow(color: coffee.opacity(0.15), radius: 12, y: 4)
                 .scaleEffect(animate ? 1.0 : 0.8)
@@ -62,8 +76,10 @@ struct ContentView: View {
                 .multilineTextAlignment(.center)
         }
         .onAppear {
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2)) {
-                animate = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation(.spring(response: 0.8, dampingFraction: 0.6)) {
+                    animate = true
+                }
             }
         }
     }
@@ -95,25 +111,22 @@ struct ContentView: View {
 
     private var buttonsSection: some View {
         VStack(spacing: 14) {
-            NavigationLink {
-                PlantingView()
-            } label: {
+            NavigationLink(value: "Planting") {
                 Label("Start Journey", systemImage: "arrow.right.circle.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(
-                        LinearGradient(colors: [coffee, coffeeLight],
-                                       startPoint: .leading, endPoint: .trailing)
+                        LinearGradient(
+                            colors: [coffee, coffeeLight],
+                            startPoint: .leading, endPoint: .trailing)
                     )
                     .foregroundColor(.white)
                     .cornerRadius(16)
                     .shadow(color: coffee.opacity(0.3), radius: 8, y: 4)
             }
 
-            NavigationLink {
-                ScannerSnapView()
-            } label: {
+            NavigationLink(value: "Scanner") {
                 Label("Try Scanner", systemImage: "camera.viewfinder")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
@@ -127,5 +140,6 @@ struct ContentView: View {
                     )
             }
         }
+        .padding(.horizontal, 16)
     }
 }

@@ -5,13 +5,13 @@ struct CrisisView: View {
     @State private var showContent = false
 
     // Coffee palette on white
-    private let coffee      = Color(red: 0.38, green: 0.22, blue: 0.10)
-    private let coffeeBg    = Color(red: 0.97, green: 0.95, blue: 0.92)
-    private let amber       = Color(red: 0.75, green: 0.50, blue: 0.15)
-    private let rustOrange  = Color(red: 0.85, green: 0.45, blue: 0.15)
-    private let dangerRed   = Color(red: 0.75, green: 0.22, blue: 0.18)
-    private let textDark    = Color(red: 0.20, green: 0.12, blue: 0.08)
-    private let textSec     = Color(red: 0.50, green: 0.40, blue: 0.32)
+    private let coffee = Color(red: 0.38, green: 0.22, blue: 0.10)
+    private let coffeeBg = Color(red: 0.97, green: 0.95, blue: 0.92)
+    private let amber = Color(red: 0.75, green: 0.50, blue: 0.15)
+    private let rustOrange = Color(red: 0.85, green: 0.45, blue: 0.15)
+    private let dangerRed = Color(red: 0.75, green: 0.22, blue: 0.18)
+    private let textDark = Color(red: 0.20, green: 0.12, blue: 0.08)
+    private let textSec = Color(red: 0.50, green: 0.40, blue: 0.32)
 
     var body: some View {
         ZStack {
@@ -54,8 +54,9 @@ struct CrisisView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(
-                    LinearGradient(colors: [amber, rustOrange],
-                                   startPoint: .top, endPoint: .bottom)
+                    LinearGradient(
+                        colors: [amber, rustOrange],
+                        startPoint: .top, endPoint: .bottom)
                 )
                 .scaleEffect(pulse ? 1.05 : 0.95)
         }
@@ -69,11 +70,13 @@ struct CrisisView: View {
                 .foregroundColor(rustOrange)
                 .multilineTextAlignment(.center)
 
-            Text("Coffee Leaf Rust — a fungal disease that can destroy an entire harvest and wipe out a family's income.")
-                .font(.body)
-                .foregroundColor(textDark)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
+            Text(
+                "Coffee Leaf Rust — a fungal disease that can destroy an entire harvest and wipe out a family's income."
+            )
+            .font(.body)
+            .foregroundColor(textDark)
+            .multilineTextAlignment(.center)
+            .lineSpacing(4)
 
             Text("But what if you could catch it early?")
                 .font(.callout.weight(.medium))
@@ -93,16 +96,15 @@ struct CrisisView: View {
     }
 
     private var scanButton: some View {
-        NavigationLink {
-            ScannerSnapView()
-        } label: {
+        NavigationLink(value: "Scanner") {
             Label("Scan Leaf", systemImage: "camera.viewfinder")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
-                    LinearGradient(colors: [rustOrange, dangerRed],
-                                   startPoint: .leading, endPoint: .trailing)
+                    LinearGradient(
+                        colors: [rustOrange, dangerRed],
+                        startPoint: .leading, endPoint: .trailing)
                 )
                 .foregroundColor(.white)
                 .cornerRadius(16)
