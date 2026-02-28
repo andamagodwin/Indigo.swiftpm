@@ -27,10 +27,15 @@ struct CrisisView: View {
                 .offset(y: -60)
                 .animation(.easeInOut(duration: 2.0), value: isInfected)
 
-            VStack(spacing: 28) {
-                Spacer()
+            VStack(spacing: 30) {
                 crisisText
+                    .padding(.top, 20)
+
+                Spacer()
+
                 interactiveAnimationSection
+
+                Spacer()
 
                 if showScanButton {
                     scanButton
@@ -38,7 +43,6 @@ struct CrisisView: View {
                 } else {
                     Color.clear.frame(height: 56)
                 }
-                Spacer().frame(height: 40)
             }
             .padding(.horizontal, 32)
             .opacity(showContent ? 1 : 0)
@@ -110,15 +114,7 @@ struct CrisisView: View {
                 .foregroundColor(textSec)
                 .padding(.top, 4)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(coffeeBg)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(rustOrange.opacity(0.15), lineWidth: 1)
-                )
-        )
+        .padding(.top, 20)
     }
 
     private var scanButton: some View {
